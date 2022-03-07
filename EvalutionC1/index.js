@@ -1,33 +1,43 @@
 const express = require("express");
-
 const app = express();
 
-app.use(logger); // logger() logger
 
-app.get("/books", logger, logger, logger, (req, res) => {
-  return res.send({ route: "/books", role: req.role });
-});
-
-app.get("/libreries", (req, res) => {
-  return res.send({ route: "/libreries", role: req.role });
-});
-
-app.get("/authors", (req, res) => {
-  return res.send({ route: "/authors", role: req.role });
-});
+app.use(logger);
 
 
+app.get("/books", (req, res) => {
+    res.send({ route: "/books" })
+})
+
+app.get("/libraries", checkPermission("librarian"), (req, res) => {
+    res.send({ route: "/libraries", permission: req.role })
+})
 
 
+app.get("/authors", checkPermission("author"), (req, res) => {
+    res.send({ route: "/authors", permission: req.role })
+})
 
 
+function logger(req, res, next) {
+    console.log("I am logger woking for all three routes");
+    next();
+}
 
-// const books=require("express");
-// const book=books();
-// book.listen(4000, () => {
-//     console.log("server running on port 4000")
-// });
-// book.get("/books",function(req,res){
-//     res.json(["ikigai","The shinning","Abooks"])
-// })
+function checkPermission(role) {
+    return function logger1(req, res, next) {
+        if (role == "librarian") {
+            req.role = true;
+            return next();
+        }
+        else if (role == "author") {
+            req.role = true;
+            return next();
+        }
 
+    }
+}
+
+app.listen(3000, () => {
+    console.log("server run on 3000 port");
+})
